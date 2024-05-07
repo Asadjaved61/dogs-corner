@@ -2,28 +2,32 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Container,
-  ListGroup,
   Pagination,
   Row,
   Spinner,
   Tab,
   Tabs,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { DogBreedI } from "../interfaces/DogBreed.interface";
 import "./Dogs.css";
 import { api_endpoints } from "../data/api_endpoints";
-import DogsList from "./DogsList";
+
+// Lazy load the DogsList component
+const DogsList = React.lazy(() => import("./DogsList"));
 
 const Dogs = () => {
+  // State for storing the list of dogs and the active page
   const [dogs, setDogs] = useState<DogBreedI[] | null>(null);
   const [activePage, setActivePage] = useState(1);
 
+  // Constants for pagination
   const dogsPerPage = 10;
   const totalPages = dogs ? Math.ceil(dogs.length / dogsPerPage) : 0;
+  // Compute the list of dogs to display on the current page
   const dogsOnPage = dogs
     ? dogs.slice((activePage - 1) * dogsPerPage, activePage * dogsPerPage)
     : [];
+  // Compute the list of dogs with a lifespan of more than 15 years
   const dogsWithLongLifespan = useMemo(() => {
     return dogs?.filter((dog) => {
       const lifespan = dog?.life_span.split(" - ");
@@ -33,10 +37,12 @@ const Dogs = () => {
     });
   }, [dogs]);
 
+  // Fetch the list of dogs when the component mounts
   useEffect(() => {
     fetchDogs();
   }, []);
 
+  // Function to fetch the list of dogs from the API
   const fetchDogs = async () => {
     try {
       const response = await axios.get(api_endpoints.dogs);
@@ -51,8 +57,10 @@ const Dogs = () => {
       <Tabs defaultActiveKey='list'>
         <Tab eventKey='list' title='List of Breeds'>
           {dogs ? (
+            // If the dogs have been fetched, display the DogsList component
             <DogsList dogsOnPage={dogsOnPage} />
           ) : (
+            // Otherwise, display a spinner
             <Spinner animation='border' />
           )}
           <Row className='mt-3'>

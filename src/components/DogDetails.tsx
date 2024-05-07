@@ -7,19 +7,25 @@ import { Card, Container, ListGroup, Row, Spinner } from "react-bootstrap";
 import { api_endpoints } from "../data/api_endpoints";
 
 const DogDetails = () => {
+  // Get the id from the URL parameters
   const { id } = useParams();
+  // State for storing the details of the dog
   const [dog, setDog] = useState<DogBreedI | null>(null);
 
+  // Fetch the details of the dog when the id changes
   useEffect(() => {
     fetchDogDetails();
   }, [id]);
 
+  // Function to fetch the details of the dog from the API
   const fetchDogDetails = async () => {
     try {
+      // If the id is undefined, don't make the API call
       if (id === undefined) return;
       const response = await axios.get(
         api_endpoints.dog(parseInt(id as string))
       );
+      // Set the dog state with the response data
       setDog(response.data);
     } catch (error) {
       console.error("Error fetching dog details:", error);
@@ -27,6 +33,7 @@ const DogDetails = () => {
   };
 
   return dog ? (
+    // If the dog details have been fetched, display them
     <Container className='mt-5 d-flex justify-content-center align-items-center'>
       <Card style={{ width: "35rem" }}>
         <Card.Img
